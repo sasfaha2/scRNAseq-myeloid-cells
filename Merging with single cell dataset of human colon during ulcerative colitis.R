@@ -5,7 +5,36 @@ library(ggplot2)
 library(ggrepel)
 library(cluster)
 library(reshape2)
+library(Matrix)
 library(harmony)
+
+### Human Data: Import
+uc.sparse <- readMM(file = "./SCP259/gene_sorted-Imm.matrix.mtx")
+uc.cells <- read.csv("./SCP259/Imm.barcodes2.tsv", header = F)
+uc.genes <- read.csv("./SCP259/Imm.genes.tsv", header = F)
+dimnames(uc.sparse) <- list(uc.genes$V1,uc.cells$V1)
+# tab delimited file requires read.delim
+uc.meta <- read.delim("./SCP259/all.meta2.txt", header = TRUE, sep = "\t")
+# remove first row of non-cell data
+uc.meta <- uc.meta[-1,]
+# trim non-myeloid cells
+myeloid <- c("CD69+ Mast", "CD69- Mast", "Cycling Monocytes", "DC1", "DC2", "Inflammatory Monocytes", "Macrophages")
+uc.meta <- uc.meta[which(uc.meta$Cluster %in% myeloid),]
+uc.sparse <- uc.sparse[,which(colnames(uc.sparse) %in% uc.meta$NAME)]
+# or trim non-immune cells (only necessary in meta)
+immune <- c("Plasma", "CD8+ IELs", "Tregs", "Cycling T", "CD8+ IL17+", "CD8+ LP", "CD4+ Activated Fos-hi", "CD4+ Activated Fos-lo", "Cycling B", "CD4+ PD1+", "Follicular", "CD4+ Memory", "GC", "ILCs", "NKs", "MT-hi", "CD69+ Mast", "CD69- Mast", "Cycling Monocytes", "DC1", "DC2", "Inflammatory Monocytes", "Macrophages")
+uc.meta <- uc.meta[which(uc.meta$Cluster %in% immune),]
+# generate seurat object
+uc <- CreateSeuratObject(counts = uc.sparse, project = "uc", min.cells = 3, min.features = 200)
+# add meta data to seurat object
+uc$cell_type <- uc.meta$Cluster
+uc$disease <- uc.meta$Health
+uc$patient <- uc.meta$Subject
+# remove extras
+rm(uc.data, uc.genes, uc.cells, uc.meta, uc.sparse, myeloid, immune, evens)
+# 27310 cells, 18671 genes
+dim(uc)
+save(list = "uc", file = "./UC Raw Data.RData")
 
 ### Human Data: Harmony Batch Correction
 # Visualize by patient prior to batch correction
