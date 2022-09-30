@@ -6,7 +6,7 @@ library(ggrepel)
 library(cluster)
 library(reshape2)
 
-# Quality Control, First Round (showing control only)
+### Quality Control, First Round (showing control only)
 control[["percent.mt"]] <- PercentageFeatureSet(control, pattern = "^mt-")
 # estimate 1.5*IQR for number of UMIs expressed; cells 1.5*IQR to be removed
 control.iqr <- as.vector(quantile(control$nFeature_RNA)[4] - quantile(control$nFeature_RNA)[2])
@@ -19,7 +19,7 @@ control.zero <- which(!as.vector(rowSums(control) == 0))
 # merge control, dss and oxa into a single dataset
 myeloid <- merge(control, y = c(dss, oxa), add.cell.ids = c("control", "dss", "oxa"), project = "myeloid")
 
-# Preprocessing
+### Preprocessing
 myeloid <- NormalizeData(myeloid, normalization.method = "LogNormalize", scale.factor = 1e4)
 myeloid <- FindVariableFeatures(myeloid, selection.method = 'vst', nfeatures = 2000)
 myeloid <- ScaleData(myeloid, vars.to.regress = c("percent.mt"), features = rownames(myeloid))
