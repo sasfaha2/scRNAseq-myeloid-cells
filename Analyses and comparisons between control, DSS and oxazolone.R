@@ -61,7 +61,8 @@ mimmune$gd_score <- gb.markers
 
 ### Differential Expression Analysis and Visualization
 # DSS vs Oxa
-DSSOxa.markers <- SetIdent(mimmune, value = "orig.ident") %>% FindMarkers(., ident.1 = "dss", ident.2 = "oxa", only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
+DSSOxa.markers <- SetIdent(mimmune, value = "orig.ident") %>%
+  FindMarkers(., ident.1 = "dss", ident.2 = "oxa", only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25)
 # log10 transform and make gene name column
 log10(DSSOxa.markers$p_val_adj)*-1 -> DSSOxa.markers$p_val_adj_neglog10
 rownames(DSSOxa.markers) -> DSSOxa.markers$Name
@@ -82,18 +83,25 @@ ggplot(DSSOxa.markers, aes(x = avg_log2FC, y = p_val_adj_neglog10)) +
   geom_text_repel(data = subset(DSSOxa.markers,
                                 (DSSOxa.markers$avg_log2FC > 1 |
                                    DSSOxa.markers$avg_log2FC < -1) &
-                                  DSSOxa.markers$p_val_adj_neglog10 > 2),aes(avg_log2FC, p_val_adj_neglog10, label = Name),max.overlaps = 50, size = 5, box.padding = .5, force = 2)
+                                  DSSOxa.markers$p_val_adj_neglog10 > 2), aes(avg_log2FC, p_val_adj_neglog10, label = Name), 
+                  max.overlaps = 50, size = 5, box.padding = .5, force = 2)
 
 ### Representative GO enrichment Analysis and Visualization
+# convert symbol to ensembl IDs
+ensembl <- bitr(rownames(mimmune), fromType = "SYMBOL", toType = c("ENTREZID", "ENSEMBL"), OrgDb = "org.Mm.eg.db")
 # filter for top genes by group
-cluster_ids <- mimmune.markers %>% group_by(cluster) %>% dplyr::arrange(desc(avg_log2FC), .by_group = TRUE) %>% dplyr::filter(row_number() <= 50)
+cluster_ids <- mimmune.markers %>%
+  group_by(cluster) %>% 
+  dplyr::arrange(desc(avg_log2FC), .by_group = TRUE) %>%
+  dplyr::filter(row_number() <= 50)
 p <- as.character(unique(cluster_ids$cluster))
 # make list of genes and their ensemble IDs
 cluster_ids <- sapply(levels(as.factor(cluster_ids$cluster)), function(x) {ensembl[match((cluster_ids[cluster_ids$cluster==x,] %>% .$gene), ensembl$SYMBOL), "ENTREZID"]})
 cluster_ids <- split(cluster_ids, rep(1:ncol(cluster_ids), each = nrow(cluster_ids)))
 names(cluster_ids) <- p
 condition_mods <- compareCluster(cluster_ids, fun = "enrichGO", OrgDb = org.Mm.eg.db, ont = "BP", minGSSize = 50, pAdjustMethod = "BH", pvalueCutoff = 0.05, qvalueCutoff = 0.05)
-p1 <- dotplot(condition_mods, showCategory = 13) + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 15), axis.text.y = element_text(size = 15), text = element_text(size = 15), axis.title.x = element_text(size = 15))
+p1 <- dotplot(condition_mods, showCategory = 15) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 15), axis.text.y = element_text(size = 15), text = element_text(size = 15), axis.title.x = element_text(size = 15))
 p1
 
 ### Pseudotime Trajectory Analysis of Neutrophils
