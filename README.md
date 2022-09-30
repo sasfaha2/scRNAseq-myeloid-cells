@@ -1,6 +1,6 @@
 # Single Cell Analyses of the Mouse Models of Colitis
 
-Analysis of 10x scRNA-seq transcriptomic profile of murine colonic immune cells in control healthy mice, DSS and oxazolone-induced colitis. Our analysis compared the mouse models of colitis to each other, and to a single cell dataset of human colon during health and UC<sup>[1](##References)</sup>, with a focus on myeloid cells.
+Analysis of 10x scRNA-seq transcriptomic profile of murine colonic immune cells in control healthy mice, DSS and oxazolone-induced colitis. Our analysis compared the mouse models of colitis (MMoC) to each other, and to a single cell dataset of human colon during health and ulcerative colitis (UC)<sup>[1](##References)</sup>, with a focus on myeloid cells.
 
 This repository contains code for:
 
