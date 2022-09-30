@@ -24,3 +24,8 @@ myeloid <- NormalizeData(myeloid, normalization.method = "LogNormalize", scale.f
 myeloid <- FindVariableFeatures(myeloid, selection.method = 'vst', nfeatures = 2000)
 myeloid <- ScaleData(myeloid, vars.to.regress = c("percent.mt"), features = rownames(myeloid))
 myeloid <- RunPCA(myeloid, features = VariableFeatures(object = myeloid))
+
+### Quality Control, Second Round
+# Subset epithelial and immune cells; remove low quality, doublet and erythroid clusters (7, 8, 14)
+mepi <- subset(myeloid, idents = c("0", "2", "4", "9", "13", "15", '16', "17"))
+mimmune <- subset(myeloid, idents = c("1", "3", "5", "6", "10", "11", "12", "18", "19", "20"))
