@@ -8,9 +8,9 @@ This repository contains code for:
 * MULTI-Seq<sup>[2](##References)</sup> sample demultiplexing using Seurat<sup>[3](##References)</sup>
 * Clustering and single cells and marker gene detection
 * Ambient RNA contamination removal
-* Comparison between control, DSS and oxazolone
+* Analyses and comparisons between control, DSS and oxazolone
 * Merging with single cell dataset of human colon during ulcerative colitis
-* Comparison between murine and human myeloid cells.
+* Analyses and comparisons between murine and human myeloid cells.
 
 Please contact Ojan Khosravifar if you have any questions (ojankhosrvaifar@gmail.com).
 
