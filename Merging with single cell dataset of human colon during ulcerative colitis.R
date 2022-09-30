@@ -42,25 +42,3 @@ hsmm <- IntegrateData(anchorset = immune.anchors, features.to.integrate = rownam
 # specify that we will perform downstream analysis on the corrected data note that the
 # original unmodified data still resides in the 'RNA' assay
 DefaultAssay(hsmm) <- "integrated"
-
-### Human and Mouse Cluster Similarity Analysis
-# Identify human cluster marker genes
-SetIdent(hsmm, value = "condition") %>%
-  subset(., idents = c("Inflamed", "Non-inflamed", "Healthy")) %>%
-  SetIdent(value = "ids") %>% FindAllMarkers(only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25) -condition.markers
-# Identify mouse cluster marker genes
-SetIdent(hsmm, value = "condition") %>%
-  subset(., idents = c("control", "dss", "oxa")) %>%
-  SetIdent(value = "cell_ids") %>% FindAllMarkers(only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25) %>% rbind(., condition.markers) -condition.markers
-# 78 is minimum number of significant markers for a cluster
-condition_sim <- condition.markers %>% group_by(cluster) %>% dplyr::arrange(desc(avg_log2FC), .by_group = TRUE) %>% dplyr::filter(row_number() <= 78)
-sim <- matrix(NA, nrow = 13, ncol = 13)
-colnames(sim) <- levels(condition_sim$cluster)
-rownames(sim) <- levels(condition_sim$cluster)
-for (i in 1:13){
-  for (l in 1:13){
-# determine shared cluster markers between all clusters out of 78
-    sim[i,l] <- length(which((condition_sim %>% dplyr::filter(cluster == rownames(sim)[i]) %>% .$gene) %in% (condition_sim %>% dplyr::filter(cluster == rownames(sim)[l]) %>% .$gene)) == TRUE)/78
-  }
-}
-heatmap(sqrt(sim), scale = "none", cexRow = 2, cexCol = 2, margins = c(25,25))
